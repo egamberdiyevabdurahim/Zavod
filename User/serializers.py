@@ -20,4 +20,15 @@ class UserSer(serializers.ModelSerializer):
 class XodimSer(serializers.ModelSerializer):
     class Meta:
         model = Xodim
-        fields = ('id', 'first_name', 'last_name', 'photo', 'phone', 'ish_turi', 'id_raqam', 'gender')
+        fields = ('id', 'first_name', 'last_name', 'photo', 'phone', 'ish_turi', 'id_raqam', 'gender', 'bulimi')
+    
+    def update(self, instance, validated_data):
+        instance.first_name = validated_data.get('first_name', instance.first_name)
+        instance.last_name = validated_data.get('last_name', instance.last_name)
+        instance.photo = validated_data.get('photo', instance.photo)
+        instance.phone = validated_data.get('phone', instance.phone)
+        instance.bulimi = validated_data.get('bulimi', instance.bulimi)
+        instance.id_raqam = validated_data.get('id_raqam', instance.id_raqam)
+        instance.gender = validated_data.get('gender', instance.gender)
+        instance.save()
+        return instance

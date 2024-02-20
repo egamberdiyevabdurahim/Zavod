@@ -20,7 +20,7 @@ class Ish_TuriSer(serializers.ModelSerializer):
 class BulimSer(serializers.ModelSerializer):
     class Meta:
         model = Bulim
-        fields = ('id', 'name', 'bulim_id', 'user', 'xodim')
+        fields = ('id', 'name', 'bulim_id', 'user')
 
 
 class MahsulotSer(serializers.ModelSerializer):

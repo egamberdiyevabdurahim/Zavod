@@ -24,7 +24,6 @@ class Bulim(models.Model):
         return f'{self.name}/{self.bulim_id}/{self.user}'
 
 
-
 class Xodim(models.Model):
     GENDER = (
         ('Erkak', 'Erkak'),
@@ -39,8 +38,7 @@ class Xodim(models.Model):
     phone = models.CharField(max_length=15, null=True, blank=True)
     ish_turi = models.ManyToManyField(Ish_Turi, related_name='xodim_ish_turi')
     id_raqam = models.CharField(max_length=9, unique=True)
-    bulim = models.ForeignKey(Bulim, on_delete=models.CASCADE, related_name='xodim_bulim', null=True)
-    
+    bulimi = models.ForeignKey(Bulim, on_delete=models.CASCADE, related_name='xodim_bulim')
 
     def __str__(self):
         return f'{self.id_raqam}/{self.first_name}/{self.last_name}'
