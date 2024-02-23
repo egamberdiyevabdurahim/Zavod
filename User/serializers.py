@@ -1,7 +1,14 @@
 from rest_framework import serializers
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, TokenRefreshSerializer
 from .models import User
 from Post.models import Xodim
+
+
+class MyTokenRefreshSerializer(TokenRefreshSerializer):
+    def validate(self, attrs):
+        data = super(MyTokenRefreshSerializer, self).validate(attrs)
+        data['refresh'] = attrs['refresh']
+        return data
 
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
