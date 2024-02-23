@@ -89,6 +89,9 @@ SWAGGER_SETTINGS = {
 
 # CORS_ALLOW_ALL_ORIGINS = True
 CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_PRIVATE_NETWORK: True
+
+
 CORS_ALLOW_METHODS = (
     "DELETE",
     "GET",
@@ -96,6 +99,22 @@ CORS_ALLOW_METHODS = (
     "PATCH",
     "POST",
     "PUT",
+)
+
+
+CORS_EXPOSE_HEADERS = [
+    "content-type",
+    "x-custom-header",
+    ]
+
+
+CORS_ALLOW_HEADERS = (
+    "accept",
+    "authorization",
+    "content-type",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
 )
 
 
