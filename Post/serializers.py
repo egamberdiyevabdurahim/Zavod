@@ -8,31 +8,31 @@ from User.serializers import *
 class PhotoSer(serializers.ModelSerializer):
     class Meta:
         model = Photo
-        fields = ('id', 'photo')
+        fields = '__all__'
 
 
 class Ish_TuriSer(serializers.ModelSerializer):
     class Meta:
         model = Ish_Turi
-        fields = ('id', 'name', 'ish_id')
+        fields = '__all__'
 
 
 class BulimSer(serializers.ModelSerializer):
     class Meta:
         model = Bulim
-        fields = ('id', 'name', 'bulim_id', 'user')
+        fields = '__all__'
 
 
 class MahsulotSer(serializers.ModelSerializer):
     class Meta:
         model = Mahsulot
-        fields = ('id', 'name','mahsulot_id')
+        fields = '__all__'
 
 
 class XatolarSer(serializers.ModelSerializer):
     class Meta:
         model = Xatolar
-        fields = ('id', 'name', 'xato_id')
+        fields = '__all__'
 
 
 class MissedSer(serializers.ModelSerializer):
@@ -40,6 +40,7 @@ class MissedSer(serializers.ModelSerializer):
     class Meta:
         model = Missed
         fields = ('id', 'xodim', 'user', 'xato', 'xato_soni', 'butun_soni', 'mahsulot', 'created_at', 'updated_at', 'photo', 'izoh', 'ish_vaqti', 'audio')
+        read_only_fields = ['photo']
 
     def update(self, instance, validated_data):
         instance.xodim = validated_data.get('xodim', instance.xodim)
@@ -51,11 +52,11 @@ class MissedSer(serializers.ModelSerializer):
         instance.izoh = validated_data.get('izoh', instance.izoh)
         instance.ish_vaqti = validated_data.get('ish_vaqti', instance.ish_vaqti)
         instance.audio = validated_data.get('audio', instance.audio)
-        # a = validated_data.get('photo',None)
-        # if a:
-        #     for x in a:
-        #         new_photo = Photo.objects.create(photo=x)
-        #         instance.photo.add(new_photo)
+        a = validated_data.get('photo',None)
+        if a:
+            for x in a:
+                new_photo = Photo.objects.create(photo=x)
+                instance.photo.add(new_photo)
             
         # instance.photo.remove(validated_data.get('photo', instance.photo))
         # news = instance.save()

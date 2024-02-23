@@ -23,10 +23,10 @@ class XodimList(ListCreateAPIView):
     serializer_class = XodimSer
 
 
-class XodimDetail(RetrieveUpdateDestroyAPIView):
-    parser_classes = [MultiPartParser, JSONParser]
-    queryset = Xodim.objects.all()
-    serializer_class = XodimSer
+# class XodimDetail(RetrieveUpdateDestroyAPIView):
+#     parser_classes = [MultiPartParser, JSONParser]
+#     queryset = Xodim.objects.all()
+#     serializer_class = XodimSer
 
 
 # class SignUp(APIView):
@@ -65,22 +65,26 @@ class XodimDetail(RetrieveUpdateDestroyAPIView):
 #         return Response(ser.errors)
 
 
-# class XodimDetail(APIView):
-#     parser_classes = [MultiPartParser, JSONParser]
-#     def get(self, request, id):
-#         xodim = Xodim.objects.get(id=id)
-#         ser = XodimSer(xodim)
-#         return Response(ser.data)
+class XodimDetail(APIView):
+    parser_classes = [MultiPartParser, JSONParser]
+    def get(self, request, id):
+        xodim = Xodim.objects.get(id=id)
+        ser = XodimSer(xodim)
+        return Response(ser.data)
     
-#     def patch(self, request, id):
-#         xodim = Xodim.objects.get(id=id)
-#         ser = XodimSer(xodim, data=request.data, partial=True)
-#         if ser.is_valid():
-#             ser.save()
-#             return Response(ser.data)
-#         return Response(ser.errors)
+    def patch(self, request, id):
+        ish = request.data.getlist('ish_turi', [])
+        xodim = Xodim.objects.get(id=id)
+        ser = XodimSer(xodim, data=request.data, partial=True)
+        if ser.is_valid():
+            news = ser.save()
+            if ish:
+                for x in ish:
+                    news.ish_turi.add(x)
+            return Response(ser.data)
+        return Response(ser.errors)
     
-#     def delete(self, request, id):
-#         xodim = Xodim.objects.get(id=id)
-#         xodim.delete()
-#         return Response(status=204)
+    def delete(self, request, id):
+        xodim = Xodim.objects.get(id=id)
+        xodim.delete()
+        return Response(status=204)

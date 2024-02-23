@@ -9,13 +9,27 @@ from .serializers import *
 from .models import *
 
 
-# class PhotoEditView(APIView):
-#     def patch(self, request, id):
-#         photo = Photo.objects.get(id=id)
-#         rasm = request.data.get('photo')
-#         photo.photo = rasm
-#         photo.save()
-#         return Response()
+class Ish_TuriEdit(APIView):
+    def patch(self, request, id):
+        photo = Ish_Turi.objects.get(id=id)
+        rasm = request.data.get('name')
+        photo.name = rasm
+        photo.save()
+        return Response({'message': 'successfully'})
+
+
+class PhotoEditView(APIView):
+    def patch(self, request, id):
+        photo = Photo.objects.get(id=id)
+        rasm = request.data.get('photo')
+        photo.photo = rasm
+        photo.save()
+        return Response({'message': 'successfully'})
+    
+    def delete(self, request, id):
+        photo = Photo.objects.get(id=id)
+        photo.delete()
+        return Response({'message': 'deleted successfully'})
 
 
 class PhotoList(ListCreateAPIView):
@@ -72,16 +86,16 @@ class XatolarDetail(RetrieveUpdateDestroyAPIView):
     serializer_class = XatolarSer
 
 
-class MissedList(ListCreateAPIView):
-    parser_classes = (MultiPartParser, JSONParser)
-    queryset = Missed.objects.all()
-    serializer_class = MissedSer
+# class MissedList(ListCreateAPIView):
+#     parser_classes = (MultiPartParser, JSONParser)
+#     queryset = Missed.objects.all()
+#     serializer_class = MissedSer
 
 
-class MissedDetail(RetrieveUpdateDestroyAPIView):
-    parser_classes = (MultiPartParser, JSONParser)
-    queryset = Missed.objects.all()
-    serializer_class = MissedSer
+# class MissedDetail(RetrieveUpdateDestroyAPIView):
+#     parser_classes = (MultiPartParser, JSONParser)
+#     queryset = Missed.objects.all()
+#     serializer_class = MissedSer
 
 
 # class PhotoList(APIView):
@@ -253,54 +267,41 @@ class BulimDetail(APIView):
 #         return Response(status=204)
 
 
-# class MissedList(APIView):
-#     parser_classes = (MultiPartParser, JSONParser)
-#     def get(self, request):
-#         missed = Missed.objects.all()
-#         ser = MissedGetSer(missed, many=True)
-#         return Response(ser.data)
+class MissedList(APIView):
+    parser_classes = (MultiPartParser, JSONParser)
+    def get(self, request):
+        missed = Missed.objects.all()
+        ser = MissedGetSer(missed, many=True)
+        return Response(ser.data)
     
-#     def post(self, request):
-#         photo_list = request.data.getlist('photo', [])
-#         ser = MissedSer(data=request.data)
-#         if ser.is_valid():
-#             news = ser.save()
-#             for x in photo_list:
-#                 p = Photo.objects.create(photo=x)
-#                 news.photo.add(p)
-#             return Response(ser.data, status=201)
-#         return Response(ser.errors, status=400)
+    def post(self, request):
+        photo_list = request.data.getlist('photo', [])
+        ser = MissedSer(data=request.data)
+        if ser.is_valid():
+            news = ser.save()
+            for x in photo_list:
+                p = Photo.objects.create(photo=x)
+                news.photo.add(p)
+            return Response(ser.data, status=201)
+        return Response(ser.errors, status=400)
 
 
-# class MissedDetail(APIView):
-#     parser_classes = (MultiPartParser, JSONParser)
-#     def get(self, request, id):
-#         missed = Missed.objects.get(id=id)
-#         ser = MissedSer(missed)
-#         return Response(ser.data)
+class MissedDetail(APIView):
+    parser_classes = (MultiPartParser, JSONParser)
+    def get(self, request, id):
+        missed = Missed.objects.get(id=id)
+        ser = MissedSer(missed)
+        return Response(ser.data)
     
-#     def patch(self, request, id):
-#         a = request.data.get('photo',None)
-#         missed = Missed.objects.get(id=id)
-#         ser = MissedSer(missed, data=request.data, partial=True)
-#         if ser.is_valid():
-#             news = ser.save()
-#             if a:
-#                 for x in a:
-#                     new_photo = Photo.objects.create(photo=x)
-#                     news.photo.add(new_photo)
-#             # instance.photo.remove(validated_data.get('photo', instance.photo))
-        
-#             # a = request.data.get('photo',None)
-#             # if a:
-#             #     for x in a:
-#             #         new_photo = Photo.objects.create(photo=x)
-#             #         c.photo.add(new_photo)
-#             #         c.photo.remove(request.data.get('photo'))
-#             return Response(ser.data, status=201)
-#         return Response(ser.errors, status=400)
+    def patch(self, request, id):
+        missed = Missed.objects.get(id=id)
+        ser = MissedSer(missed, data=request.data, partial=True)
+        if ser.is_valid():
+            ser.save()
+            return Response(ser.data, status=201)
+        return Response(ser.errors, status=400)
     
-#     def delete(self, request, id):
-#         missed = Missed.objects.get(id=id)
-#         missed.delete()
-#         return Response(status=204)
+    def delete(self, request, id):
+        missed = Missed.objects.get(id=id)
+        missed.delete()
+        return Response(status=204)
