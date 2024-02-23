@@ -9,15 +9,6 @@ from .serializers import *
 from .models import *
 
 
-class Ish_TuriEdit(APIView):
-    def patch(self, request, id):
-        photo = Ish_Turi.objects.get(id=id)
-        rasm = request.data.get('name')
-        photo.name = rasm
-        photo.save()
-        return Response({'message': 'successfully'})
-
-
 class PhotoEditView(APIView):
     def patch(self, request, id):
         photo = Photo.objects.get(id=id)

@@ -1,7 +1,16 @@
 from rest_framework import serializers
-
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from .models import User
 from Post.models import Xodim
+
+
+class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+    def validate(self, attrs):
+        data = super(MyTokenObtainPairSerializer, self).validate(attrs)
+        user = User.objects.get(username=self.user.username)
+        data['status'] = user.status
+        data['id'] = user.id
+        return data
 
 
 class UserSer(serializers.ModelSerializer):
