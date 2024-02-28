@@ -259,7 +259,7 @@ class BulimDetail(APIView):
 
 
 class MissedList(APIView):
-    parser_classes = (MultiPartParser, JSONParser)
+    parser_classes = [MultiPartParser, JSONParser]
     def get(self, request):
         missed = Missed.objects.all()
         ser = MissedGetSer(missed, many=True)
@@ -278,7 +278,7 @@ class MissedList(APIView):
 
 
 class MissedDetail(APIView):
-    parser_classes = (MultiPartParser, JSONParser)
+    parser_classes = [MultiPartParser, JSONParser]
     def get(self, request, id):
         missed = Missed.objects.get(id=id)
         ser = MissedSer(missed)

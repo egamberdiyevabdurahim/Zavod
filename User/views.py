@@ -16,6 +16,23 @@ class SignUp(ListCreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSer
 
+class Userdetail(APIView):
+    def get(self, request, id):
+        user = User.objects.get(id=id)
+        ser = UserSer(user)
+        return Response(ser.data)
+    
+    def patch(self, request, id):
+        old_pass = request.data.get('old_pass')
+        ser = UserSer(data=request.data)
+        if ser.is_valid():
+            user = User.objects.get(id=id)
+            
+            if user.password == old_pass:
+                ser.save()
+                return Response(ser.data)
+        return Response(ser.errors)
+
 
 class XodimList(ListCreateAPIView):
     parser_classes = [MultiPartParser, JSONParser]
@@ -79,6 +96,7 @@ class XodimDetail(APIView):
         if ser.is_valid():
             news = ser.save()
             if ish:
+                news.ish_turi.clear()
                 for x in ish:
                     news.ish_turi.add(x)
             return Response(ser.data)
