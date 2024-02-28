@@ -4,6 +4,16 @@ from .models import User
 from Post.models import Xodim
 
 
+class ChangePasswordSerializer(serializers.Serializer):
+    model = User
+
+    """
+    Serializer for password change endpoint.
+    """
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
+
+
 class MyTokenRefreshSerializer(TokenRefreshSerializer):
     def validate(self, attrs):
         data = super(MyTokenRefreshSerializer, self).validate(attrs)
@@ -31,6 +41,17 @@ class UserSer(serializers.ModelSerializer):
         user.set_password(validated_data.pop('password', None))
         user.save()
         return user
+    
+    def update(self, instance, validated_data):
+        instance.username = validated_data.get('username', instance.username)
+        instance.first_name = validated_data.get('first_name', instance.first_name)
+        instance.last_name = validated_data.get('last_name', instance.last_name)
+        instance.photo = validated_data.get('photo', instance.photo)
+        instance.phone = validated_data.get('phone', instance.phone)
+        # instance.status = validated_data.get('status', instance.status)
+        instance.gender = validated_data.get('gender', instance.gender)
+        instance.save()
+        return instance
 
 
 class XodimSer(serializers.ModelSerializer):
