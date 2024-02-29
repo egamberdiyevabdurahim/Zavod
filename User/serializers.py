@@ -27,6 +27,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         user = User.objects.get(username=self.user.username)
         data['status'] = user.status
         data['id'] = user.id
+        data['gender'] = user.gender
         return data
 
 

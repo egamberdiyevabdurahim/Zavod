@@ -285,10 +285,15 @@ class MissedDetail(APIView):
         return Response(ser.data)
     
     def patch(self, request, id):
+        photo_list = request.data.getlist('photo')
         missed = Missed.objects.get(id=id)
         ser = MissedSer(missed, data=request.data, partial=True)
         if ser.is_valid():
-            ser.save()
+            news = ser.save()
+            if photo_list:
+                for x in photo_list:
+                    p = Photo.objects.create(photo=x)
+                    news.photo.add(p)
             return Response(ser.data, status=201)
         return Response(ser.errors, status=400)
     

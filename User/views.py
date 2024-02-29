@@ -6,42 +6,39 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.generics import RetrieveUpdateDestroyAPIView, ListCreateAPIView, UpdateAPIView
 from rest_framework.parsers import MultiPartParser, JSONParser
+from django.contrib.auth.hashers import check_password
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import User
 from Post.models import Ish_Turi, Xodim
 from .serializers import UserSer, XodimSer, ChangePasswordSerializer
 
 
-class ChangePasswordView(UpdateAPIView):
-        """
-        An endpoint for changing password.
-        """
-        serializer_class = ChangePasswordSerializer
-        model = User
-        permission_classes = (IsAuthenticated,)
+class ChangePasswordView(APIView):
+    parser_classes = [MultiPartParser, JSONParser]
+    permission_classes = [IsAuthenticated]
 
-        def get_object(self, queryset=None):
-            obj = self.request.user
-            return obj
+    def put(self, request, *args, **kwargs):
+        serializer = ChangePasswordSerializer(data=request.data)
 
-        def update(self, request, *args, **kwargs):
-            self.object = self.get_object()
-            serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            user = self.request.user
+            old_password = serializer.data.get('old_password')
+            new_password = serializer.data.get('new_password')
 
-            if serializer.is_valid():
-                # Check old password
-                if not self.object.check_password(serializer.data.get("old_password")):
-                    return Response({"old_password": ["Wrong password."]})
-                # set_password also hashes the password that the user will get
-                self.object.set_password(serializer.data.get("new_password"))
-                self.object.save()
-                response = {
-                    'status': 'success',
-                }
+            if not user.check_password(old_password):
+                return Response({'detail': 'Old password is incorrect.'})
 
-                return Response(response)
+            user.set_password(new_password)
+            user.save()
+            refresh = RefreshToken.for_user(user)
+            access = str(refresh.access_token)
+            return Response({'detail': 'Password changed successfully.',
+                             'access': access,
+                             'refresh': str(refresh)
+                             })
 
-            return Response(serializer.errors)
+        return Response(serializer.errors)
 
 
 class SignUp(ListCreateAPIView):
