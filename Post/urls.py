@@ -6,6 +6,8 @@ from .views import (PhotoList, PhotoEditView, IshTuriList, Ish_TuriDetail, Bulim
 
 
 urlpatterns = [
+    # path('maxsulot/', Maxsulot.as_view(), name='maxsulot'),
+    # path('statistic/', XodimStatistic.as_view(), name='statistic'),
     path('photo/', PhotoList.as_view(), name='photo'),
     path('photoedit/<int:id>/', PhotoEditView.as_view(), name='photo_edit'),
     path('ish_turi/', IshTuriList.as_view(), name='ish_turi'),

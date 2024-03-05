@@ -8,7 +8,7 @@ class Photo(models.Model):
 
 
 class Ish_Turi(models.Model):
-    name = models.CharField(max_length=40)
+    name = models.CharField(max_length=40, unique=True)
     ish_id = models.CharField(max_length=9, unique=True)
 
     def __str__(self):
@@ -16,7 +16,7 @@ class Ish_Turi(models.Model):
 
 
 class Bulim(models.Model):
-    name = models.CharField(max_length=90)
+    name = models.CharField(max_length=90, unique=True)
     bulim_id = models.CharField(max_length=9, unique=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
 
@@ -41,12 +41,12 @@ class Xodim(models.Model):
     bulimi = models.ForeignKey(Bulim, on_delete=models.CASCADE, related_name='xodim_bulim')
 
     def __str__(self):
-        return f'{self.id_raqam}/{self.first_name}/{self.last_name}'
+        return f'{self.id_raqam}/{self.first_name}'
 
 
 
 class Mahsulot(models.Model):
-    name = models.CharField(max_length=90)
+    name = models.CharField(max_length=90, unique=True)
     mahsulot_id = models.CharField(max_length=9, unique=True)
 
     def __str__(self):
@@ -54,7 +54,7 @@ class Mahsulot(models.Model):
 
 
 class Xatolar(models.Model):
-    name = models.CharField(max_length=90)
+    name = models.CharField(max_length=90, unique=True)
     xato_id = models.CharField(max_length=9, unique=True)
 
     def __str__(self):
@@ -78,4 +78,4 @@ class Missed(models.Model):
     audio = models.FileField(upload_to='missed_audio/', blank=True, null=True)
 
     def __str__(self):
-        return f'{self.xodim}/{self.user}/{self.xato}'
+        return f'{self.xodim}/{self.user}/{self.mahsulot}'

@@ -1,12 +1,106 @@
 from django.shortcuts import render
+from django.db.models import Q, F, Count, Sum, Min, Max
 
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.generics import RetrieveUpdateDestroyAPIView, ListCreateAPIView
 from rest_framework.parsers import MultiPartParser, JSONParser
 
-from .serializers import *
-from .models import *
+from .serializers import (PhotoSer, Ish_TuriSer, BulimSer, MahsulotSer,
+                          XatolarSer, MissedSer, MissedGetSer)
+from .models import (Photo, Ish_Turi, Bulim, Xodim, Mahsulot, Xatolar, Missed)
+
+
+from datetime import datetime, timedelta
+from django.utils import timezone
+
+
+# class Maxsulot(APIView):
+#     parser_classes = [JSONParser, MultiPartParser]
+#     def get(self, request):
+#         xodim = Xodim.objects.all()
+#         l = []
+#         for x in xodim:
+#             missed = Missed.objects.filter(xodim=x)
+#             sum_xato = missed.aggregate(Sum('xato_soni'))
+#             sum_butun = missed.aggregate(Sum('butun_soni'))
+#             # xatosi = missed.aggregate(Count('xato'))
+#             # for k in missed:
+#             l.append({
+#                 'name': x.missed_xodim.mahsulot.name,
+#                 'xodimi': x.first_name,
+#                 'xato_soni': sum_xato,
+#                 'butun_soni': sum_butun,
+#                 # 'xato': xatosi
+#             })
+#         return Response(l)
+
+
+
+# class XodimStatistic(APIView):
+#     parser_classes = [JSONParser, MultiPartParser]
+#     def get(self, request):
+        # xodim = Xodim.objects.all()
+        # l = []
+        # for x in xodim:
+        #     missed = Missed.objects.filter(xodim=x)
+        #     for k in missed:
+        #         d = {}
+        #         d['name'] = x.first_name
+        #         d['ish_vaqti'] = k.ish_vaqti
+        #         for 
+        #         d['xato_soni'] = k.xato_soni
+            
+
+
+class XodimStatistic(APIView):
+    parser_classes = [JSONParser, MultiPartParser]
+
+    def get(self, request):
+        xozir = timezone.now()
+        
+        bir_yil_oldin = xozir - timedelta(days=365)
+        olti_oy_oldin = xozir - timedelta(days=30*6)
+        bir_oy_oldin = xozir - timedelta(days=30)
+        bir_xafta_oldin = xozir - timedelta(days=7)
+        bir_kun_oldin = xozir - timedelta(days=1)
+
+        statistics = []
+
+        def statistika(start_date, end_date):
+            xodimlar = Xodim.objects.all()
+            data = []
+            for x in xodimlar:
+                missed = Missed.objects.filter(xodim=x, created_at__range=[start_date, end_date])
+                total_ish_vaqti = 0
+                total_xato_soni = 0
+                total_butun_soni = 0
+                for hisobot in missed:
+                    total_ish_vaqti += hisobot.ish_vaqti
+                    total_xato_soni += hisobot.xato_soni
+                    total_butun_soni += hisobot.butun_soni
+                data.append({
+                    'ism': x.first_name,
+                    'ish_vaqti': total_ish_vaqti,
+                    'xato_soni': total_xato_soni,
+                    'butun_soni': total_butun_soni
+                })
+            return data
+
+        # Calculate statistics for different time periods and append to the statistics list
+        statistics.append({'period': '1 year', 'data': statistika(bir_yil_oldin, xozir)})
+        statistics.append({'period': '6 months', 'data': statistika(olti_oy_oldin, xozir)})
+        statistics.append({'period': '1 month', 'data': statistika(bir_oy_oldin, xozir)})
+        statistics.append({'period': '1 week', 'data': statistika(bir_xafta_oldin, xozir)})
+        statistics.append({'period': '1 day', 'data': statistika(bir_kun_oldin, xozir)})
+
+        return Response(statistics)
+
+
+# class StatisticView(APIView):
+#     def get(self, request):
+
+
 
 
 class PhotoEditView(APIView):
@@ -170,7 +264,24 @@ class BulimDetail(APIView):
     def get(self, request, id):
         bulim = Bulim.objects.get(id=id)
         ser = BulimSer(bulim)
-        return Response(ser.data)
+        xodim = Xodim.objects.filter(bulimi=bulim)
+        for x in xodim:
+            h = Missed.objects.filter(xodim=x)
+            print(x)
+        k = []
+        for j in h:
+            found = False
+            for item in k:
+                if item['bulim_name'] == j.xodim.bulimi.name:
+                    item['xato_soni'] += j.xato_soni
+                    item['butun_soni'] += j.butun_soni
+                    found = True
+                    break
+            if not found:
+                k.append({'bulim_name': j.xodim.bulimi.name, 'xato_soni': j.xato_soni, 'butun_soni': j.butun_soni})
+        return Response({'data':ser.data,
+                         'statistic':k,
+                         })
     
     def patch(self, request, id):
         bulim = Bulim.objects.get(id=id)
