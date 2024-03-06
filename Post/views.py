@@ -9,6 +9,7 @@ from rest_framework.parsers import MultiPartParser, JSONParser
 from .serializers import (PhotoSer, Ish_TuriSer, BulimSer, MahsulotSer,
                           XatolarSer, MissedSer, MissedGetSer)
 from .models import (Photo, Ish_Turi, Bulim, Xodim, Mahsulot, Xatolar, Missed)
+from User.models import User
 
 
 from datetime import datetime, timedelta
@@ -254,6 +255,8 @@ class BulimList(APIView):
         """
         ser = BulimSer(data=request.data)
         if ser.is_valid():
+            status_b = ser.validated_data['user']
+            print(status_b)
             ser.save()
             return Response(ser.data, status=201)
         return Response(ser.errors, status=400)
@@ -264,23 +267,57 @@ class BulimDetail(APIView):
     def get(self, request, id):
         bulim = Bulim.objects.get(id=id)
         ser = BulimSer(bulim)
-        xodim = Xodim.objects.filter(bulimi=bulim)
-        for x in xodim:
-            h = Missed.objects.filter(xodim=x)
-            print(x)
-        k = []
-        for j in h:
-            found = False
-            for item in k:
-                if item['bulim_name'] == j.xodim.bulimi.name:
-                    item['xato_soni'] += j.xato_soni
-                    item['butun_soni'] += j.butun_soni
-                    found = True
-                    break
-            if not found:
-                k.append({'bulim_name': j.xodim.bulimi.name, 'xato_soni': j.xato_soni, 'butun_soni': j.butun_soni})
+        a = {}
+        if Missed.objects.filter(xodim__bulimi=bulim):
+            missed = Missed.objects.filter(xodim__bulimi=bulim)
+            sum_xato = missed.aggregate(soni=Sum('xato_soni'))
+            sum_butun = missed.aggregate(soni=Sum('butun_soni'))
+            a[str('bulim_name')]=str(bulim.name)
+            a[str('bulim_id')]=str(bulim.bulim_id)
+            a[str('bulim_boshliq')]=str(bulim.user.first_name)
+            a[str('xato_soni')]=sum_xato
+            a[str('butun_soni')]=sum_butun
+            a[str('hisobot_soni')]=len(missed)
+            b = missed.aggregate(Count('xodim'))
+            a[str('xodim_soni')]=b
+
+            c = []
+            for j in missed:
+                print(j)
+                found = False
+                for item in c:
+                    if item['mahsulot_name'] == j.mahsulot.name:
+                        item['mahsulot_id'] += j.mahsulot.mahsulot_id
+                        item['xato_soni'] += j.xato_soni
+                        item['butun_soni'] += j.butun_soni
+                        found = True
+                        break
+                if not found:
+                    c.append({'mahsulot_name': j.mahsulot.name, 'mahsulot_id': j.mahsulot.mahsulot_id, 'xato_soni': j.xato_soni, 'butun_soni': j.butun_soni})
+
+            d = []
+            for j in missed:
+                print(j)
+                found = False
+                for item in d:
+                    if item['xato_name'] == j.xato.name:
+                        item['xato_id'] = j.xato.xato_id
+                        item['mahsulot_name'] = j.mahsulot.name
+                        item['xato_soni'] += j.xato_soni
+                        found = True
+                        break
+                if not found:
+                    d.append({'xato_name': j.xato.name, 'xato_id': j.xato.xato_id, 'mahsulot_name': j.mahsulot.name, 'xato_soni': j.xato_soni})
+            return Response({'data':ser.data,
+                         'statistic':a,
+                         'mahsulot':c,
+                         'xato': d
+
+                         })
         return Response({'data':ser.data,
-                         'statistic':k,
+                         'statistic':None,
+                         'mahsulot':None,
+                         'xato': None
                          })
     
     def patch(self, request, id):

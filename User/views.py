@@ -42,10 +42,10 @@ class ChangePasswordView(APIView):
         return Response(serializer.errors)
 
 
-class SignUp(ListCreateAPIView):
-    parser_classes = [MultiPartParser, JSONParser]
-    queryset = User.objects.all()
-    serializer_class = UserSer
+# class SignUp(ListCreateAPIView):
+#     parser_classes = [MultiPartParser, JSONParser]
+#     queryset = User.objects.all()
+#     serializer_class = UserSer
 
 class Userdetail(APIView):
     permission_classes = [IsAuthenticated,]
@@ -69,20 +69,24 @@ class Userdetail(APIView):
 #     serializer_class = XodimSer
 
 
-# class SignUp(APIView):
-#     parser_classes = [MultiPartParser, JSONParser]
-#     permission_classes = [permissions.AllowAny]
-#     def get(self, request):
-#         user = User.objects.all()
-#         ser = UserSer(user, many=True)
-#         return Response(ser.data)
+class SignUp(APIView):
+    parser_classes = [MultiPartParser, JSONParser]
+    permission_classes = [permissions.AllowAny]
+    def get(self, request):
+        user = User.objects.all()
+        ser = UserSer(user, many=True)
+        return Response(ser.data)
 
-    # def post(self, request):
-    #     ser = UserSer(data=request.data)
-    #     if ser.is_valid():
-    #         ser.save()
-    #         return Response(ser.data)
-    #     return Response(ser.errors)
+    def post(self, request):
+        ser = UserSer(data=request.data)
+        if ser.is_valid():
+            status_d = ser.validated_data.get('status')
+            if status_d in ['Direktor', 'Admin']:
+                if User.objects.filter(status=status_d).exists():
+                    return Response({'message': f'Bunday {status_d} Tayinlab Bulingan'})
+            ser.save()
+            return Response(ser.data)
+        return Response(ser.errors)
 
 
 class XodimList(APIView):
@@ -191,6 +195,7 @@ class XodimDetail(APIView):
         
         k = []
         for j in h:
+            print(j)
             found = False
             for item in k:
                 if item['mahsulot_name'] == j.mahsulot.name:

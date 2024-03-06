@@ -21,9 +21,6 @@ class BulimSer(serializers.ModelSerializer):
     class Meta:
         model = Bulim
         fields = '__all__'
-    
-    # def validate_user(self, user):
-        
 
 
 class MahsulotSer(serializers.ModelSerializer):

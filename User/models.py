@@ -4,10 +4,10 @@ from django.contrib.auth.models import AbstractUser
 
 class User(AbstractUser):
     STATUS = (
-        ('Diretor', 'Diretor'),
+        ('Direktor', 'Direktor'),
         ('Admin', 'Admin'),
         ('Tekshiruvchi', 'Tekshiruvchi'),
-        ('Bulum', 'Bulum'),
+        ('Bulim', 'Bulim'),
     )
     
     GENDER = (
